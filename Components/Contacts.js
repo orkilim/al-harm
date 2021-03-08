@@ -1,7 +1,7 @@
 import React, { useEffect, useState} from 'react';
 import * as Contacts from 'expo-contacts';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
-
+import { Searchbar } from 'react-native-paper';
 
 const styles = StyleSheet.create({
   container:{
@@ -18,9 +18,13 @@ const styles = StyleSheet.create({
 });
 
 
-export default function App() {
+export default function ContactsPage() {
   const [contacts, setContacts ] = useState([])
+  const [filteredDataSource, setFilteredDataSource] = useState([])
   const [closeFriends, setCloseFriends ] = useState([])
+  const [searchQuery, setSearchQuery] = React.useState('')
+  const onChangeSearch = query => setSearchQuery(query)
+  const [show, setShow] = useState(false)
 
   useEffect(() => {
     (async () => {
@@ -33,30 +37,41 @@ export default function App() {
         if (data.length > 0) {
           const result = data.filter((item) => item.name !== undefined)
           setContacts(result)
+          setFilteredDataSource(result)
         }
       }
     })();
   }, []);
 
-  useEffect(() => {
-    console.log('closeFriends: ', closeFriends)
-  }, [closeFriends])
+  const updateSearch = (txt) => {
+    onChangeSearch(txt)
+    setFilteredDataSource(contacts.filter((obj) => obj.name.indexOf(txt) > -1))
+    setShow(true)
+  }
 
-  return (
-    <FlatList
-        data={contacts}
-        numColumns={1}
-        renderItem={({ item }) =>
-        <TouchableOpacity onPress={() => setCloseFriends([ ...closeFriends, { name: item.name, phoneNumber: item.phoneNumbers[0].number }])}>
-          <View style={styles.container}>
-              <View style={styles.textArea}>
-                <Text style={{fontSize : 40}}> {item.name}</Text>
+    return (
+        <View>
+            <Searchbar
+                placeholder="Type Here..."
+                onChangeText={updateSearch}
+                value={searchQuery}
+                onClear={() => setShow(false)}
+            />
+            <FlatList
+            data={show ? filteredDataSource : contacts}
+            numColumns={1}
+            renderItem={({ item }) =>
+            <TouchableOpacity onPress={() => setCloseFriends([ ...closeFriends, { name: item.name, phoneNumber: item.phoneNumbers[0].number }])}>
+              <View style={styles.container}>
+                  <View style={styles.textArea}>
+                    <Text style={{fontSize : 40}}> {item.name}</Text>
+                  </View>
               </View>
-          </View>
-        </TouchableOpacity>
-        }
-        ItemSeparatorComponent={()=> <View style={{height: 2, width: "100%", backgroundColor: "rgba(0,0,0,0.5)", }} />}
-        keyExtractor={(item, index) => index.toString()}
-    />
-  );
+            </TouchableOpacity>
+            }
+            ItemSeparatorComponent={()=> <View style={{height: 2, width: "100%", backgroundColor: "rgba(0,0,0,0.5)", }} />}
+            keyExtractor={(item, index) => index.toString()}
+        />
+        </View>
+      )
 }
