@@ -1,6 +1,6 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import * as Contacts from 'expo-contacts';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Button } from 'react-native'
 import { Searchbar } from 'react-native-paper';
 
 const styles = StyleSheet.create({
@@ -18,13 +18,25 @@ const styles = StyleSheet.create({
 });
 
 
-export default function ContactsPage() {
+export default function ContactsPage({ navigation }) {
   const [contacts, setContacts ] = useState([])
   const [filteredDataSource, setFilteredDataSource] = useState([])
   const [closeFriends, setCloseFriends ] = useState([])
   const [searchQuery, setSearchQuery] = React.useState('')
   const onChangeSearch = query => setSearchQuery(query)
   const [show, setShow] = useState(false)
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Button 
+          onPress={() => navigation.navigate('Home')} 
+          title="Finish"
+          disabled={closeFriends.length > 0 ? false : true}
+        />
+      ),
+    });
+  }, [navigation, closeFriends])
 
   useEffect(() => {
     (async () => {
@@ -42,6 +54,10 @@ export default function ContactsPage() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    console.log(closeFriends.length)
+  }, [closeFriends])
 
   const updateSearch = (txt) => {
     onChangeSearch(txt)
