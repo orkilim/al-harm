@@ -14,7 +14,7 @@ export default function Navigation() {
     return (
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Home">
-              <Stack.Screen name="Home" component={HomePage} />
+              <Stack.Screen name="Welcome" component={HomePage} />
               <Stack.Screen name="WomanSignUp" component={WomanSignUp} />
               <Stack.Screen name="GuardSignUp" component={GuardSignUp} />
               <Stack.Screen name="ContactsPage" component={ContactsPage} />
