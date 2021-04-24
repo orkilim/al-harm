@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react';
 import * as Contacts from 'expo-contacts';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Button } from 'react-native'
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Button, SafeAreaView } from 'react-native'
 import { Searchbar } from 'react-native-paper';
 
 const styles = StyleSheet.create({
@@ -14,6 +14,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     fontSize : 40,
+  },
+  item: {
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 32,
   },
 });
 
@@ -56,7 +66,7 @@ export default function ContactsPage({ navigation }) {
   }, []);
 
   useEffect(() => {
-    console.log(closeFriends.length)
+    console.log(closeFriends)
   }, [closeFriends])
 
   const updateSearch = (txt) => {
@@ -65,6 +75,36 @@ export default function ContactsPage({ navigation }) {
     setShow(true)
   }
 
+  const handlePress = (item) => {
+    // setCloseFriends([ ...closeFriends, { name: item.name, phoneNumber: item.phoneNumbers[0].number }])
+    setCloseFriends(closeFriends.some(bla => bla.name === item.name) ? closeFriends.filter((it) => it.name !== item.name) : [ ...closeFriends, { name: item.name, phoneNumber: item.phoneNumbers[0].number }])
+    //closeFriends.some(bla => bla.name === item.name) ? setCloseFriends(closeFriends.filter((it) => it.name !== item.name)) : setCloseFriends([ ...closeFriends, { name: item.name, phoneNumber: item.phoneNumbers[0].number }])
+    //setSelectedId(item.id)
+  }
+
+  const Item = ({ item, onPress, backgroundColor, textColor }) => (
+    <TouchableOpacity 
+        onPress={onPress}
+        style={[styles.item, backgroundColor]}>
+      <Text style={[styles.title, textColor]}>{item.name}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderItem = ({ item }) => {
+    const backgroundColor = closeFriends.some(bla => bla.name === item.name) ? "#6e3b6e" : "#f9c2ff";
+    const color = closeFriends.some(bla => bla.name === item.name) ? 'white' : 'black';
+
+    return (
+      <Item
+        item={item}
+        onPress={() => handlePress(item)}
+        backgroundColor={{ backgroundColor }}
+        textColor={{ color }}
+      />
+    );
+  };
+
+  
     return (
         <View>
             <Searchbar
@@ -76,17 +116,10 @@ export default function ContactsPage({ navigation }) {
             <FlatList
             data={show ? filteredDataSource : contacts}
             numColumns={1}
-            renderItem={({ item }) =>
-            <TouchableOpacity onPress={() => setCloseFriends([ ...closeFriends, { name: item.name, phoneNumber: item.phoneNumbers[0].number }])}>
-              <View style={styles.container}>
-                  <View style={styles.textArea}>
-                    <Text style={{fontSize : 40}}> {item.name}</Text>
-                  </View>
-              </View>
-            </TouchableOpacity>
-            }
+            renderItem={renderItem}
             ItemSeparatorComponent={()=> <View style={{height: 2, width: "100%", backgroundColor: "rgba(0,0,0,0.5)", }} />}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(item, index) => item.id}
+            //extraData={selectedId}
         />
         </View>
       )
