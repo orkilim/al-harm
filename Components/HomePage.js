@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { Button, View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
+const width = Dimensions.get('window').width
 
 const styles = StyleSheet.create({
     container: {
@@ -16,26 +17,53 @@ const styles = StyleSheet.create({
       marginVertical: 8,
     },
     fixToText: {
-      flexDirection: 'row',
       justifyContent: 'space-between',
+      display: 'flex'
     },
+    btnContainerStyle: {
+        backgroundColor: '#42A5F5',
+        paddingVertical: 8,
+        width: width / 1.1,
+        height: 55,
+        margin: 10,
+        borderRadius: 14,
+        fontWeight: '500',
+      },
+      btnTextStyle: {
+        color: '#ffffff',
+        fontSize: 25,
+        textTransform: 'uppercase',
+        textAlign: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Quicksand-Medium',
+      },
 });
-  
+
+
+const Button = ({ text, onPress }) => {
+    return (
+      <TouchableOpacity onPress={onPress}>
+        <View style={styles.btnContainerStyle}>
+          <Text style={styles.btnTextStyle}> {text} </Text>
+        </View>
+      </TouchableOpacity>
+    )
+}
 
 export default function HomePage({ navigation }) {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Welcome!</Text>
-      <Text>I'm:</Text>
+        <View style={styles.txtArea}>
+            <Text style={{ fontSize: 25, marginTop: -20 }}>I'm a:</Text>
+        </View>
       <View style={styles.fixToText}>
             <Button
-                title="Woman"
-                background = "red"
+                text="Woman"
                 onPress={() =>
                 navigation.navigate('WomanSignUp')}
             />
             <Button
-                title="Guard"
+                text="Guard"
                 onPress={() =>
                 navigation.navigate('GuardSignUp')}
             />
