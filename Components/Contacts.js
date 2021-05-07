@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
 });
 
 
-export default function ContactsPage({ navigation }) {
+export default function ContactsPage({ route, navigation }) {
   const [contacts, setContacts ] = useState([])
   const [filteredDataSource, setFilteredDataSource] = useState([])
   const [closeFriends, setCloseFriends ] = useState([])
@@ -40,13 +40,19 @@ export default function ContactsPage({ navigation }) {
     navigation.setOptions({
       headerRight: () => (
         <Button 
-          onPress={() => navigation.navigate('Home')} 
+        onPress={() => {
+          navigation.navigate('fetch', {
+            constacts: { ...closeFriends },
+            womanAddress: route.params
+          });
+        }}
           title="Finish"
           disabled={closeFriends.length > 0 ? false : true}
         />
       ),
     });
   }, [navigation, closeFriends])
+
 
   useEffect(() => {
     (async () => {
@@ -65,10 +71,6 @@ export default function ContactsPage({ navigation }) {
     })();
   }, []);
 
-  useEffect(() => {
-    console.log(closeFriends)
-  }, [closeFriends])
-
   const updateSearch = (txt) => {
     onChangeSearch(txt)
     setFilteredDataSource(contacts.filter((obj) => obj.name.indexOf(txt) > -1))
@@ -76,11 +78,9 @@ export default function ContactsPage({ navigation }) {
   }
 
   const handlePress = (item) => {
-    // setCloseFriends([ ...closeFriends, { name: item.name, phoneNumber: item.phoneNumbers[0].number }])
     setCloseFriends(closeFriends.some(bla => bla.name === item.name) ? closeFriends.filter((it) => it.name !== item.name) : [ ...closeFriends, { name: item.name, phoneNumber: item.phoneNumbers[0].number }])
-    //closeFriends.some(bla => bla.name === item.name) ? setCloseFriends(closeFriends.filter((it) => it.name !== item.name)) : setCloseFriends([ ...closeFriends, { name: item.name, phoneNumber: item.phoneNumbers[0].number }])
-    //setSelectedId(item.id)
   }
+  
 
   const Item = ({ item, onPress, backgroundColor, textColor }) => (
     <TouchableOpacity 
@@ -104,7 +104,6 @@ export default function ContactsPage({ navigation }) {
     );
   };
 
-  
     return (
         <View>
             <Searchbar
@@ -119,7 +118,6 @@ export default function ContactsPage({ navigation }) {
             renderItem={renderItem}
             ItemSeparatorComponent={()=> <View style={{height: 2, width: "100%", backgroundColor: "rgba(0,0,0,0.5)", }} />}
             keyExtractor={(item, index) => item.id}
-            //extraData={selectedId}
         />
         </View>
       )
